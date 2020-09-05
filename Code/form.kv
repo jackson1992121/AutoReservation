@@ -1,0 +1,113 @@
+#: import Button kivy.uix.button.Button
+
+<LblTxt@BoxLayout>:
+    orientation: 'horizontal'
+    padding: 10
+    lblTxtIn: 'default'
+    placeHolder: app.placeholder
+    outValue: outTxt
+    Label:
+        text: root.lblTxtIn
+        font_name: 'takao/TakaoPMincho.ttf'
+        font_size: sp(20)
+    TextInput:
+        id: outTxt  
+        text: root.placeHolder
+        font_name: 'takao/TakaoPMincho.ttf'
+        font_size: sp(20)
+
+<DropdownPart@BoxLayout>:
+    orientation: 'horizontal'
+    padding: 10
+    lblTxtIn: 'default'
+    Label:
+        text: root.lblTxtIn
+        font_name: 'takao/TakaoPMincho.ttf'
+        font_size: sp(20)
+
+    DropDownLayout:
+        Button:
+            id: btn
+            text: app.select_lesson
+            font_name: 'takao/TakaoPMincho.ttf'
+            font_size: sp(20)
+            on_parent: dropdown.dismiss()
+            on_release: dropdown.open(self)
+            size_hint_y: None
+            height: '36dp'
+
+        DropDown:
+
+            id: dropdown
+            on_select: btn.text = '{}'.format(args[1])
+            on_select: app.cur_lesson = '{}'.format(args[1])
+            
+            on_parent:
+                for key in app.cur_lesson_data: txt = key; Button(text = txt, font_name = 'takao/TakaoPMincho.ttf', 
+                font_size = sp(20), height = '36dp', background_color = (0.0, 1.0, 0.0, 0.95), on_release = lambda btn: dropdown.select(key))
+
+            
+
+<HelpTxt@BoxLayout>:
+    orientation: 'horizontal'
+    helpText: 'default'
+    align: 'left'
+    Label:
+        pos_hint: {root.align: 1}
+        height: 20
+        text: root.helpText
+        font_name: 'takao/TakaoPMincho.ttf'
+        font_size: sp(16)
+
+<MyLayout@BoxLayout>:  
+    orientation: 'vertical'
+    padding: 10
+
+    LblTxt:   
+        id: account_id
+        lblTxtIn: app.account_id
+        placeHolder: app.account_name
+
+    LblTxt:   
+        id: account_pwd
+        lblTxtIn: app.account_password
+        placeHolder: app.account_pwd
+
+    LblTxt:
+        id: lesson_id
+        lblTxtIn: app.lesson_name
+        placeHolder: str(1)
+
+    LblTxt:   
+        id: weekday
+        lblTxtIn: app.week_day
+        placeHolder: str(app.cur_week_day)
+
+    LblTxt:   
+        id: timerange
+        lblTxtIn: app.time_range
+        placeHolder: str(app.cur_time_range)
+
+    BoxLayout:
+        padding: 10
+        Button:
+            text: app.button_text
+            font_name: 'takao/TakaoPMincho.ttf'
+            font_size: sp(20)
+            background_color: (0.184, 0.8745, 0.4588, 0.95)
+            on_release: 
+                app.start_automation(account_id.outValue.text, account_pwd.outValue.text, lesson_id.outValue.text, weekday.outValue.text, timerange.outValue.text)
+
+    BoxLayout:
+        orientation: 'vertical'      
+        Label:
+            text: app.help_text_1
+            font_name: 'takao/TakaoPMincho.ttf'
+            font_size: sp(16)
+
+        Label:
+            text: app.help_text_2
+            font_name: 'takao/TakaoPMincho.ttf'
+            font_size: sp(14)        
+
+MyLayout
