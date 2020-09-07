@@ -113,20 +113,23 @@ def click_confirm():
 
 def execute_auto(id, pwd, lesson_id, week_day, time_range):
 
-    # settings for chrome
-    chrome_options = Options()
-    # Private browsing
-    chrome_options.add_argument("--incognito")
-    chrome_options.add_argument("start-maximized")
-    # chrome_options.add_argument("--headless")
-    chrome_options.add_experimental_option(
-        "excludeSwitches", ["enable-automation"])
-    chrome_options.add_experimental_option('useAutomationExtension', False)
+    try:
+      # settings for chrome
+      chrome_options = Options()
+      # Private browsing
+      chrome_options.add_argument("--incognito")
+      chrome_options.add_argument("start-maximized")
+      # chrome_options.add_argument("--headless")
+      chrome_options.add_experimental_option(
+          "excludeSwitches", ["enable-automation"])
+      chrome_options.add_experimental_option('useAutomationExtension', False)
 
-    driver = wd.Chrome(executable_path='chromedriver.exe', options=chrome_options)
+      driver = wd.Chrome(executable_path='chromedriver.exe', options=chrome_options)
 
-    driver.set_page_load_timeout(60)
-    driver.get("https://www.goldsgym-membership.jp/reservation")
+      driver.set_page_load_timeout(60)
+      driver.get("https://www.goldsgym-membership.jp/reservation")
+    except:
+      return "driver"
 
 
     # login
@@ -159,7 +162,9 @@ def execute_auto(id, pwd, lesson_id, week_day, time_range):
     if btn_rsv:
         scroll_down_to(driver, btn_rsv)
     else:
-        return False
+        diver.close()
+        driver.quit()
+        return "false"
 
     # click btn
     btn_rsv.click()
@@ -167,14 +172,18 @@ def execute_auto(id, pwd, lesson_id, week_day, time_range):
     # check if button clicked
     success = wait_tag(driver, 10, "p.compBox")
     if success == None:
-        return False
+        diver.close()
+        driver.quit()
+        return "false"
     else:
         if "予約を完了しました" in success.get_attribute('innerHTML'):
             driver.close()
             driver.quit()
-            return True
+            return "true"
         else:
-            return False
+            diver.close()
+            driver.quit()
+            return "false"
 
 def main():
     result = execute_auto("calcio", "adam", "000001", "2", "00-08")

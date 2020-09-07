@@ -33,7 +33,7 @@ exe = EXE(pyz,
           a.datas,          
           *[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
           name='reservation',
-          debug=True,
+          debug=False,
           strip=False,
           upx=True,
-          console=True)
+          console=False)

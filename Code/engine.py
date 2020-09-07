@@ -109,10 +109,17 @@ class MyApp(App):
             write_log_file(log_file_path, "レッスンの番号が無効です")
             return
 
-        if execute_auto(id, pwd, id_array[int(lesson_id) - 1], weekday, self.get_time_range(time_range)):
+        result_status = execute_auto(id, pwd, id_array[int(lesson_id) - 1], weekday, self.get_time_range(time_range))
+
+        if result_status == "true":
             ctypes.windll.user32.MessageBoxW(0, "予約が成功しました", "予約成功", 0x40000)
-        else:
+            write_log_file(log_file_path, "予約が成功しました")
+        elif result_status == "false":
             ctypes.windll.user32.MessageBoxW(0, "予約が失敗しました", "予約失敗", 0x40000)
+            write_log_file(log_file_path, "予約が失敗しました")
+        elif result_status == "driver":
+            ctypes.windll.user32.MessageBoxW(0, "ドライバーを更新してください", "予約失敗", 0x40000)
+            write_log_file(log_file_path, "ドライバーを更新してください")
 
 def resourcePath():
     '''Returns path containing content - either locally or in pyinstaller tmp file'''
