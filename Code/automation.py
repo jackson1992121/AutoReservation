@@ -59,7 +59,7 @@ def find_tag(driver, tag_str, wait_time = 0.5, limit_count = 1):
 
 def scroll_down_to(driver, element):
     driver.execute_script("arguments[0].scrollIntoView", element)
-    wait_between(0.8, 1)
+    wait_between(0.01, 0.05)
 
 def wait_between(a, b):
     rand = uniform(a, b)
@@ -147,10 +147,12 @@ def execute_auto(id, pwd, lesson_id, week_day, time_range):
             reserve_btn = driver.find_element_by_css_selector("input[name='btn_res']")
             if reserve_btn and reserve_btn.is_enabled():
                 break
-        btn_back = driver.find_element_by_css_selector("input.btnback")
-        btn_back.click()
-        btn_search = wait_tag(driver, 10, "input[type='submit']")
-        btn_search.click()
+        # btn_back = driver.find_element_by_css_selector("input.btnback")
+        # btn_back.click()
+        # btn_search = wait_tag(driver, 10, "input[type='submit']")
+        # btn_search.click()
+        driver.refresh()
+        # wait_between(0.005, 0.01)
         
     reserve_btn.click()
 
@@ -159,9 +161,10 @@ def execute_auto(id, pwd, lesson_id, week_day, time_range):
     input_tag.send_keys(pwd)
 
     btn_rsv = driver.find_element_by_css_selector("input[name='btn_rsv']")
-    if btn_rsv:
-        scroll_down_to(driver, btn_rsv)
-    else:
+    # if btn_rsv:
+    #     scroll_down_to(driver, btn_rsv)
+    # else:
+    if btn_rsv == None:
         diver.close()
         driver.quit()
         return "false"

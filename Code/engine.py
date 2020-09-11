@@ -61,7 +61,7 @@ class MyApp(App):
     week_day = "曜日"
     time_range = "開始時間帯"
     cur_time_range = 8
-    cur_week_day = str(1 if ( datetime.now().weekday() + 1 ) % 7 == 0 else ( datetime.now().weekday() + 1 ) % 7)
+    cur_week_day = str(1 if ( datetime.now().weekday() + 2 ) % 8 == 0 else ( datetime.now().weekday() + 2 ) % 8)
     cur_lesson_data = {}
 
     account_id = "アカウントID"
