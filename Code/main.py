@@ -114,10 +114,10 @@ class MyApp(App):
             with open('input.txt', encoding='utf-8') as f:
                 input_data = f.readline().strip()
                 [self.account_name, self.account_pwd, self.lesson_index, self.cur_week_day, self.cur_time_range] = input_data.split(" ")                
-            self.selected_name = self.cur_lesson_array[int(self.lesson_index) - 1]
-            self.selected_weekday = self.weekday_array[int(self.cur_week_day) - 1]
         except Exception as e:
             pass
+        self.selected_name = self.cur_lesson_array[int(self.lesson_index) - 1]
+        self.selected_weekday = self.weekday_array[int(self.cur_week_day) - 1]
 
     def change_input(self, cur_text, cur_id):
 

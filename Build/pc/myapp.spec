@@ -8,7 +8,7 @@ block_cipher = None
 excludes_a = ['Tkinter', 'picamera', 'gi', 'cv2', 'enchant']
 
 
-a = Analysis(['..\\..\\Code\\engine.py'],
+a = Analysis(['..\\..\\Code\\main.py'],
              pathex=['F:\\works\\calcio\\project\\Build\\pc',
              '..\\..\\MyHiddenImports'],
              binaries=None,

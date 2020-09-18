@@ -42,7 +42,7 @@ def sendMail(result, reason):
 
         # prepare message content
         message = MIMEMultipart("alternative")
-        message["Subject"] = "multipart test"
+        message["Subject"] = "自動予約"
         message["From"] = sender_email
         message["To"] = receiver_email
         

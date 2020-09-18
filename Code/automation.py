@@ -156,9 +156,12 @@ def execute_auto(userid, pwd, lesson_id, week_day, time_range):
     login(driver, userid, pwd)
 
     # check account
-    elem = driver.find_element_by_css_selector("#contener p.txtC font")
-    if elem != None:
-        return "account"
+    try:
+        elem = driver.find_element_by_css_selector("#contener p.txtC font")
+        if elem != None:
+            return "account"
+    except:
+        pass
 
     driver.get("https://www.goldsgym-membership.jp/reservation/reserve/search")
 
