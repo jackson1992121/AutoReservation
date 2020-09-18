@@ -4,6 +4,7 @@
     orientation: 'horizontal'
     padding: 10
     lblTxtIn: 'default'
+    part: 'default'
     placeHolder: app.placeholder
     outValue: outTxt
     Label:
@@ -11,8 +12,22 @@
         font_name: 'takao/TakaoPMincho.ttf'
         font_size: sp(20)
     TextInput:
-        id: outTxt  
+        id: outTxt        
         text: root.placeHolder
+        font_name: 'takao/TakaoPMincho.ttf'
+        font_size: sp(20)
+        on_text: app.change_input(self.text, self.parent.part)
+
+<DisplayTxt@BoxLayout>:
+    orientation: 'horizontal'
+    padding: 10
+    lblTxtIn: 'default'
+    Label:
+        text: ""
+        font_name: 'takao/TakaoPMincho.ttf'
+        font_size: sp(20)
+    Label:
+        text: root.lblTxtIn
         font_name: 'takao/TakaoPMincho.ttf'
         font_size: sp(20)
 
@@ -46,7 +61,7 @@
                 for key in app.cur_lesson_data: txt = key; Button(text = txt, font_name = 'takao/TakaoPMincho.ttf', 
                 font_size = sp(20), height = '36dp', background_color = (0.0, 1.0, 0.0, 0.95), on_release = lambda btn: dropdown.select(key))
 
-            
+          
 
 <HelpTxt@BoxLayout>:
     orientation: 'horizontal'
@@ -75,18 +90,29 @@
 
     LblTxt:
         id: lesson_id
+        part: "lesson"
         lblTxtIn: app.lesson_name
-        placeHolder: str(1)
+        placeHolder: app.lesson_index
+
+    DisplayTxt:
+        id: selected_lesson_name
+        lblTxtIn: app.selected_name
 
     LblTxt:   
         id: weekday
+        part: "weekday"
         lblTxtIn: app.week_day
-        placeHolder: str(app.cur_week_day)
+        placeHolder: app.cur_week_day
+
+    DisplayTxt:
+        id: selected_weekday_item
+        lblTxtIn: app.selected_weekday
+
 
     LblTxt:   
         id: timerange
         lblTxtIn: app.time_range
-        placeHolder: str(app.cur_time_range)
+        placeHolder: app.cur_time_range
 
     BoxLayout:
         padding: 10

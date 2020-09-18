@@ -3,8 +3,9 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.config import Config
 from kivy.core.window import Window
+from kivy.properties import StringProperty
 from datetime import datetime
-Window.size = (400, 420)
+Window.size = (400, 500)
 
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -13,6 +14,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.dropdown import DropDown
 from automation import wait_between, execute_auto
 import os, sys
+from sendmail import sendMail
 
 # add the following 2 lines to solve OpenGL 2.0 bug
 from kivy import Config
@@ -51,18 +53,26 @@ class DropDownLayout(BoxLayout):
 class CustomSpinner(Spinner):
     pass
 
+class DisplayTxt(BoxLayout):
+    lblTxtIn = StringProperty()
+
+class MyLayout(BoxLayout):
+    pass  
+
 class MyApp(App):
 
     global log_file_path
-
+ 
     placeholder = "必須項目"
     lesson_name = "予約店舗名"
+    lesson_index = "1"
     select_lesson = "選択"
     week_day = "曜日"
     time_range = "開始時間帯"
-    cur_time_range = 8
+    cur_time_range = "8"
     cur_week_day = str(1 if ( datetime.now().weekday() + 2 ) % 8 == 0 else ( datetime.now().weekday() + 2 ) % 8)
     cur_lesson_data = {}
+    cur_lesson_array = []
 
     account_id = "アカウントID"
     account_name = "calcio"
@@ -78,18 +88,63 @@ class MyApp(App):
 
     help_text_1 = "曜日 ⇒「 日：1, 月：2, ... , 土：7 」"
     help_text_2 = "開始時間帯 ⇒「 ～8時台: 8, 9時台: 9, ... , 23時台: 23 」"
+    weekday_array = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"]    
 
     button_text = '予約を行う'
+    selected_name = ""
+    selected_weekday = ""
+    lesson_tag = None
+    weekday_tag = None
+
+    def get_lesson_name(self, cur_lesson_index):
+        try:
+            return self.cur_lesson_array[int(cur_lesson_index, 10) - 1] 
+        except Exception as e:
+            print(e)
+            return ""
+
+    def get_weekday_string(self, cur_weekday_index):
+        try: 
+            return self.weekday_array[int(cur_weekday_index, 10) - 1]
+        except:
+            return ""            
+
+    def get_input_data(self):
+        try:
+            with open('input.txt', encoding='utf-8') as f:
+                input_data = f.readline().strip()
+                [self.account_name, self.account_pwd, self.lesson_index, self.cur_week_day, self.cur_time_range] = input_data.split(" ")                
+            self.selected_name = self.cur_lesson_array[int(self.lesson_index) - 1]
+            self.selected_weekday = self.weekday_array[int(self.cur_week_day) - 1]
+        except Exception as e:
+            pass
+
+    def change_input(self, cur_text, cur_id):
+
+        if cur_id == "lesson":
+            self.lesson_index = cur_text
+            if self.lesson_tag:
+                self.lesson_tag.lblTxtIn = self.get_lesson_name(self.lesson_index)
+           
+        elif cur_id == "weekday":
+            self.cur_week_day = cur_text
+            if self.weekday_tag:
+                self.weekday_tag.lblTxtIn = self.get_weekday_string(self.cur_week_day)
 
     def build(self):
         self.title = "自動予約"
         self.cur_lesson_data = get_lesson_data()
-        print(self.cur_lesson_data)
+        
+        for cur_key in self.cur_lesson_data.keys():
+            self.cur_lesson_array.append(cur_key)
+        print(self.cur_lesson_array)
+
+        self.get_input_data()
 
         with open('form.kv', encoding = 'utf-8') as f:
             self.root = Builder.load_string(f.read())
-            print(self.root)
-            # self.root = Builder.load_file('form.kv')
+            self.lesson_tag = self.root.children[5]
+            self.weekday_tag = self.root.children[3]
             return self.root
 
     def get_time_range(self, time_range):
@@ -98,9 +153,19 @@ class MyApp(App):
         else:
             return "{0}-{0}".format(format(int(time_range), '02d'))
 
-    def start_automation(self, id, pwd, lesson_id, weekday, time_range):
+    def start_automation(self, userid, pwd, lesson_id, weekday, time_range):
         import ctypes
 
+        # save user settings
+        cur_path = os.path.dirname(os.path.abspath(__file__))
+        input_file_path = os.path.join(cur_path, "input.txt")
+        if os.path.exists(input_file_path):
+            os.remove(input_file_path)
+        f = open(input_file_path, "w")
+        f.write("{0} {1} {2} {3} {4}\n".format(userid, pwd, lesson_id, weekday, time_range))
+        f.close()
+
+        # run auto
         id_array = []
         for key in self.cur_lesson_data:
             id_array.append(self.cur_lesson_data[key])
@@ -109,17 +174,24 @@ class MyApp(App):
             write_log_file(log_file_path, "レッスンの番号が無効です")
             return
 
-        result_status = execute_auto(id, pwd, id_array[int(lesson_id) - 1], weekday, self.get_time_range(time_range))
+        result_status = execute_auto(userid, pwd, id_array[int(lesson_id) - 1], weekday, self.get_time_range(time_range))
 
         if result_status == "true":
             ctypes.windll.user32.MessageBoxW(0, "予約が成功しました", "予約成功", 0x40000)
             write_log_file(log_file_path, "予約が成功しました")
+            sendMail("成功", "楽しい時間をお過ごしください。")
         elif result_status == "false":
             ctypes.windll.user32.MessageBoxW(0, "予約が失敗しました", "予約失敗", 0x40000)
             write_log_file(log_file_path, "予約が失敗しました")
+            sendMail("失敗", "予約が失敗しました。")
         elif result_status == "driver":
             ctypes.windll.user32.MessageBoxW(0, "ドライバーを更新してください", "予約失敗", 0x40000)
             write_log_file(log_file_path, "ドライバーを更新してください")
+            sendMail("失敗", "ドライバーを更新してください。")
+        elif result_status == "account":
+            ctypes.windll.user32.MessageBoxW(0, "ログイン失敗", "予約失敗", 0x40000)
+            write_log_file(log_file_path, "正確なアカウントを入力してください")
+            sendMail("失敗", "正確なアカウントを入力してください。")
 
 def resourcePath():
     '''Returns path containing content - either locally or in pyinstaller tmp file'''
@@ -144,7 +216,7 @@ def main():
     log_file_path = os.path.join(cur_log, file_name)
     
     if not os.path.exists(cur_log):
-        os.mkdir(cur_log)    
+        os.mkdir(cur_log)
     
     write_log_file(log_file_path, "スタート")
     kivy.resources.resource_add_path(resourcePath())

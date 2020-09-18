@@ -10,11 +10,13 @@ from selenium.webdriver.common.action_chains import ActionChains
 from time import sleep
 from random import uniform, randrange
 
+
 def move_to_element(driver, element):
     hov = ActionChains(driver).move_to_element(element)
     hov.perform()
 
-def wait_tag(driver, wait_time, by_string, limit_count = 1, clickable = False, by_type = "css"):
+
+def wait_tag(driver, wait_time, by_string, limit_count=1, clickable=False, by_type="css"):
     times = 0
     while True:
         if times < limit_count:
@@ -22,17 +24,21 @@ def wait_tag(driver, wait_time, by_string, limit_count = 1, clickable = False, b
         else:
             return None
         try:
-            print("waiting tag : {0}...".format(by_string))         
+            print("waiting tag : {0}...".format(by_string))
             if clickable:
                 if by_type == "css":
-                    return_tag = WebDriverWait(driver, wait_time).until(EC.element_to_be_clickable((By.CSS_SELECTOR, by_string)))
+                    return_tag = WebDriverWait(driver, wait_time).until(
+                        EC.element_to_be_clickable((By.CSS_SELECTOR, by_string)))
                 else:
-                    return_tag = WebDriverWait(driver, wait_time).until(EC.element_to_be_clickable((By.XPATH, by_string)))
+                    return_tag = WebDriverWait(driver, wait_time).until(
+                        EC.element_to_be_clickable((By.XPATH, by_string)))
             else:
                 if by_type == "css":
-                    return_tag = WebDriverWait(driver, wait_time).until(EC.visibility_of_element_located((By.CSS_SELECTOR, by_string)))
+                    return_tag = WebDriverWait(driver, wait_time).until(
+                        EC.visibility_of_element_located((By.CSS_SELECTOR, by_string)))
                 else:
-                    return_tag = WebDriverWait(driver, wait_time).until(EC.visibility_of_element_located((By.XPATH, by_string)))
+                    return_tag = WebDriverWait(driver, wait_time).until(
+                        EC.visibility_of_element_located((By.XPATH, by_string)))
             print("found the tag...")
             return return_tag
         except TimeoutException:
@@ -40,7 +46,8 @@ def wait_tag(driver, wait_time, by_string, limit_count = 1, clickable = False, b
         except:
             continue
 
-def find_tag(driver, tag_str, wait_time = 0.5, limit_count = 1):
+
+def find_tag(driver, tag_str, wait_time=0.5, limit_count=1):
     limit_counts = 0
     while True:
         if limit_counts < limit_count:
@@ -52,21 +59,24 @@ def find_tag(driver, tag_str, wait_time = 0.5, limit_count = 1):
             wait_between(wait_time - 0.2, wait_time + 0.2)
         print("waiting tag {0}...".format(tag_str))
         try:
-            cur_tag = driver.find_element_by_css_selector(tag_str)        
+            cur_tag = driver.find_element_by_css_selector(tag_str)
             return cur_tag
         except:
             continue
+
 
 def scroll_down_to(driver, element):
     driver.execute_script("arguments[0].scrollIntoView", element)
     wait_between(0.01, 0.05)
 
+
 def wait_between(a, b):
     rand = uniform(a, b)
     sleep(rand)
 
+
 def select_some_option(driver, select_str, option_str):
-    
+
     select_item = find_tag(driver, select_str, 0.6)
     select_item.click()
     print("select box {0} clicked".format(select_str))
@@ -76,64 +86,79 @@ def select_some_option(driver, select_str, option_str):
     option_item.click()
     print("option {0} clicked".format(option_str))
 
-def login(driver, id, password):
+
+def login(driver, userid, password):
     dialog_input_id = WebDriverWait(driver, 30).until(EC.element_to_be_clickable(
         (By.CSS_SELECTOR, "#contener form:nth-of-type(2) input[name='id']")))
-    dialog_input_id.send_keys("calcio")
+    dialog_input_id.send_keys(userid)
 
     wait_between(1, 2)
 
-    dialog_input_pw = driver.find_element_by_css_selector( "#contener form:nth-of-type(2) input[name='pw']" )
-    dialog_input_pw.send_keys("adam")
+    dialog_input_pw = driver.find_element_by_css_selector(
+        "#contener form:nth-of-type(2) input[name='pw']")
+    dialog_input_pw.send_keys(password)
 
-    dialog_input_btn = driver.find_element_by_css_selector( "#contener form:nth-of-type(2) input[name='lipw']" )
+    dialog_input_btn = driver.find_element_by_css_selector(
+        "#contener form:nth-of-type(2) input[name='lipw']")
     dialog_input_btn.click()
 
     wait_between(1, 2)
 
+
 def do_search(driver, lesson_no, weekday, hour_range):
-    select_some_option(driver, "select[name='mise_cd']", "option[value='{0}']".format(lesson_no))
+    select_some_option(
+        driver, "select[name='mise_cd']", "option[value='{0}']".format(lesson_no))
     wait_between(0.5, 1)
-    select_some_option(driver, "select[name='s_hour']", "option[value='{0}']".format(hour_range))
+    select_some_option(
+        driver, "select[name='s_hour']", "option[value='{0}']".format(hour_range))
     wait_between(0.5, 1)
     for weekday_item in ["1", "2", "3", "4", "5", "6", "7"]:
-        check_box = driver.find_element_by_css_selector("input[value='{0}']".format(weekday_item))
+        check_box = driver.find_element_by_css_selector(
+            "input[value='{0}']".format(weekday_item))
         if check_box != None and check_box.is_selected():
             check_box.click()
             wait_between(0.1, 0.2)
     wait_between(0.5, 1)
-    check_box = driver.find_element_by_css_selector("input[value='{0}']".format(weekday))
+    check_box = driver.find_element_by_css_selector(
+        "input[value='{0}']".format(weekday))
     if check_box != None and not check_box.is_selected():
         check_box.click()
     wait_between(0.5, 1)
     driver.find_element_by_css_selector("input[type='submit']").click()
 
+
 def click_confirm():
     btn_rsv = driver.find_element_by_css_selector("input[name='btn_rsv']")
 
-def execute_auto(id, pwd, lesson_id, week_day, time_range):
+
+def execute_auto(userid, pwd, lesson_id, week_day, time_range):
 
     try:
-      # settings for chrome
-      chrome_options = Options()
-      # Private browsing
-      chrome_options.add_argument("--incognito")
-      chrome_options.add_argument("start-maximized")
-      # chrome_options.add_argument("--headless")
-      chrome_options.add_experimental_option(
-          "excludeSwitches", ["enable-automation"])
-      chrome_options.add_experimental_option('useAutomationExtension', False)
+        # settings for chrome
+        chrome_options = Options()
+        # Private browsing
+        chrome_options.add_argument("--incognito")
+        chrome_options.add_argument("start-maximized")
+        # chrome_options.add_argument("--headless")
+        chrome_options.add_experimental_option(
+            "excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option('useAutomationExtension', False)
 
-      driver = wd.Chrome(executable_path='chromedriver.exe', options=chrome_options)
+        driver = wd.Chrome(executable_path='chromedriver.exe',
+                           options=chrome_options)
 
-      driver.set_page_load_timeout(60)
-      driver.get("https://www.goldsgym-membership.jp/reservation")
+        driver.set_page_load_timeout(60)
+        driver.get("https://www.goldsgym-membership.jp/reservation")
     except:
-      return "driver"
-
+        return "driver"
 
     # login
-    login(driver, id, pwd)
+    login(driver, userid, pwd)
+
+    # check account
+    elem = driver.find_element_by_css_selector("#contener p.txtC font")
+    if elem != None:
+        return "account"
 
     driver.get("https://www.goldsgym-membership.jp/reservation/reserve/search")
 
@@ -144,7 +169,8 @@ def execute_auto(id, pwd, lesson_id, week_day, time_range):
     while True:
         p_none = driver.find_element_by_css_selector("p.mgb15")
         if p_none == None or "見つかりました" in p_none.get_attribute('innerHTML'):
-            reserve_btn = driver.find_element_by_css_selector("input[name='btn_res']")
+            reserve_btn = driver.find_element_by_css_selector(
+                "input[name='btn_res']")
             if reserve_btn and reserve_btn.is_enabled():
                 break
         # btn_back = driver.find_element_by_css_selector("input.btnback")
@@ -153,7 +179,7 @@ def execute_auto(id, pwd, lesson_id, week_day, time_range):
         # btn_search.click()
         driver.refresh()
         # wait_between(0.005, 0.01)
-        
+
     reserve_btn.click()
 
     # input password and click reservation
@@ -188,8 +214,11 @@ def execute_auto(id, pwd, lesson_id, week_day, time_range):
             driver.quit()
             return "false"
 
+
 def main():
     result = execute_auto("calcio", "adam", "000001", "2", "00-08")
     wait_between(1000, 10000)
+
+
 if __name__ == '__main__':
     main()
