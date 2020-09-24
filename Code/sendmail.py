@@ -5,8 +5,8 @@ from email.mime.text import MIMEText
 
 smtp_server = "smtp.gmail.com"
 port = 587  # For starttls
-sender_email = "davidoliver5086@gmail.com"
-password = "Metal0121!"
+sender_email = "calcio0926@gmail.com"
+password = "atm927tx"
 
 # Create a secure SSL context
 context = ssl.create_default_context()
@@ -27,7 +27,7 @@ html = """\
 </html>
 """
 
-def sendMail(result, reason):
+def sendMail(result, reason, user_email):
 
     # Try to log in to server and send email
     try:
@@ -38,7 +38,7 @@ def sendMail(result, reason):
         server.login(sender_email, password)
         # TODO: Send email here
 
-        receiver_email = "dantes0121@hotmail.com"
+        receiver_email = user_email
 
         # prepare message content
         message = MIMEMultipart("alternative")
@@ -63,7 +63,7 @@ def sendMail(result, reason):
         server.quit() 
 
 def main():
-    sendMail("成功", "楽しい時間をお過ごしください。")
+    sendMail("成功", "楽しい時間をお過ごしください。", "dantes0121@hotmail.com")
 
 
 if __name__ == '__main__':

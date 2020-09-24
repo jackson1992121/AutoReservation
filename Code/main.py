@@ -69,6 +69,7 @@ class MyApp(App):
     select_lesson = "選択"
     week_day = "曜日"
     time_range = "開始時間帯"
+    user_email = ""
     cur_time_range = "8"
     cur_week_day = str(1 if ( datetime.now().weekday() + 2 ) % 8 == 0 else ( datetime.now().weekday() + 2 ) % 8)
     cur_lesson_data = {}
@@ -110,6 +111,7 @@ class MyApp(App):
             return ""            
 
     def get_input_data(self):
+        # lesson and weekday
         try:
             with open('input.txt', encoding='utf-8') as f:
                 input_data = f.readline().strip()
@@ -118,6 +120,14 @@ class MyApp(App):
             pass
         self.selected_name = self.cur_lesson_array[int(self.lesson_index) - 1]
         self.selected_weekday = self.weekday_array[int(self.cur_week_day) - 1]
+
+        # email
+        try:
+            with open('email.txt', encoding='utf-8') as f:
+                input_data = f.readline().strip()
+                self.user_email = input_data
+        except Exception as e:
+            pass
 
     def change_input(self, cur_text, cur_id):
 
@@ -177,21 +187,29 @@ class MyApp(App):
         result_status = execute_auto(userid, pwd, id_array[int(lesson_id) - 1], weekday, self.get_time_range(time_range))
 
         if result_status == "true":
-            ctypes.windll.user32.MessageBoxW(0, "予約が成功しました", "予約成功", 0x40000)
             write_log_file(log_file_path, "予約が成功しました")
-            sendMail("成功", "楽しい時間をお過ごしください。")
+            if self.user_email != "":
+                sendMail("成功", "楽しい時間をお過ごしください。", self.user_email)
+            ctypes.windll.user32.MessageBoxW(0, "予約が成功しました", "予約成功", 0x40000)
+            
         elif result_status == "false":
-            ctypes.windll.user32.MessageBoxW(0, "予約が失敗しました", "予約失敗", 0x40000)
             write_log_file(log_file_path, "予約が失敗しました")
-            sendMail("失敗", "予約が失敗しました。")
+            if self.user_email != "":
+                sendMail("失敗", "予約が失敗しました。", self.user_email)
+            ctypes.windll.user32.MessageBoxW(0, "予約が失敗しました", "予約失敗", 0x40000)
+            
         elif result_status == "driver":
-            ctypes.windll.user32.MessageBoxW(0, "ドライバーを更新してください", "予約失敗", 0x40000)
             write_log_file(log_file_path, "ドライバーを更新してください")
-            sendMail("失敗", "ドライバーを更新してください。")
+            if self.user_email != "":
+                sendMail("失敗", "ドライバーを更新してください。", self.user_email)
+            ctypes.windll.user32.MessageBoxW(0, "ドライバーを更新してください", "予約失敗", 0x40000)
+            
         elif result_status == "account":
-            ctypes.windll.user32.MessageBoxW(0, "ログイン失敗", "予約失敗", 0x40000)
             write_log_file(log_file_path, "正確なアカウントを入力してください")
-            sendMail("失敗", "正確なアカウントを入力してください。")
+            if self.user_email != "":
+                sendMail("失敗", "正確なアカウントを入力してください。", self.user_email)
+            ctypes.windll.user32.MessageBoxW(0, "ログイン失敗", "予約失敗", 0x40000)
+            
 
 def resourcePath():
     '''Returns path containing content - either locally or in pyinstaller tmp file'''

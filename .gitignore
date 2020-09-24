@@ -2,3 +2,7 @@
 __pycache__
 log
 debug.log
+dist
+build
+/Code/email.txt
+/Code/input.txt

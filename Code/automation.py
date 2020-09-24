@@ -176,6 +176,44 @@ def execute_auto(userid, pwd, lesson_id, week_day, time_range):
                 "input[name='btn_res']")
             if reserve_btn and reserve_btn.is_enabled():
                 break
+
+                reserve_btn.click()
+                # input password and click reservation
+                input_tag = wait_tag(driver, 10, "input[name='pw']")
+                input_tag.send_keys(pwd)
+
+                # find reserve button 
+                try:
+                    btn_rsv = driver.find_element_by_css_selector("input[name='btn_rsv']")
+                    btn_rsv.click()
+
+                    # check if button clicked
+                    while True:
+                        try:
+                            try:
+                                success = driver.find_element_by_css_selector("p.compBox")
+                                if "予約を完了しました" in success.get_attribute('innerHTML'):
+                                    driver.close()
+                                    driver.quit()
+                                    return "true"
+                                else:
+                                    driver.close()
+                                    driver.quit()
+                                    return "false"
+                            except:
+                                elem = driver.find_element_by_css_selector("#contener p.txtC font")
+                                btn_back = driver.find_element_by_css_selector("input.btnback")
+                                btn_back.click()
+                                break
+                        except:
+                            continue
+
+                    continue
+
+                except:
+                    btn_back = driver.find_element_by_css_selector("input.btnback")
+                    btn_back.click()
+                    continue
         # btn_back = driver.find_element_by_css_selector("input.btnback")
         # btn_back.click()
         # btn_search = wait_tag(driver, 10, "input[type='submit']")
@@ -183,39 +221,6 @@ def execute_auto(userid, pwd, lesson_id, week_day, time_range):
         driver.refresh()
         # wait_between(0.005, 0.01)
 
-    reserve_btn.click()
-
-    # input password and click reservation
-    input_tag = wait_tag(driver, 10, "input[name='pw']")
-    input_tag.send_keys(pwd)
-
-    btn_rsv = driver.find_element_by_css_selector("input[name='btn_rsv']")
-    # if btn_rsv:
-    #     scroll_down_to(driver, btn_rsv)
-    # else:
-    if btn_rsv == None:
-        diver.close()
-        driver.quit()
-        return "false"
-
-    # click btn
-    btn_rsv.click()
-
-    # check if button clicked
-    success = wait_tag(driver, 10, "p.compBox")
-    if success == None:
-        diver.close()
-        driver.quit()
-        return "false"
-    else:
-        if "予約を完了しました" in success.get_attribute('innerHTML'):
-            driver.close()
-            driver.quit()
-            return "true"
-        else:
-            diver.close()
-            driver.quit()
-            return "false"
 
 
 def main():
